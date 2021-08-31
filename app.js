@@ -1,16 +1,9 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        all_ghost_types: {
-          "effigy": [],
-          "rusalka": [],
-          "demon": [],
-          "shade": [],
-          "oni": [],
-          "yurei": [],
-          "mare": [],
-          "chimera" []:
-        },
+        current_app_version: "0.01",
+        all_ghost_types: ["Effigy", "Rusalka", "Demon", "Shade", "Oni", "Yurei", "Mare", "Chimera"],
+        all_interactions,
         current_selected_interactions: new Array()
       };
     },
@@ -52,19 +45,26 @@ const app = Vue.createApp({
           else if (idx == this.getAllPossibleGhostTypes().length - 2) string += " and ";
           else string += ".";
         }
+        if (string == "") string += "None"; 
         return string;
       }
     },
     template: `
     <div id="app-container">
-      <div v-for="(interaction, idx) in all_interactions">
-        <input type="checkbox" :id="'interaction'+idx" :value="interaction[1]" v-model="current_selected_interactions">
-        <label for="'interaction'+idx">{{interaction[1]}}</label>
+      <div style="height:5%; overflow:auto;">
+        <div>
+          <span style="font-weight:bold;">Possible Ghost Type/s:</span> <span>{{getPossibleGhostTypeDisplay()}}</span>
+          <span style="font-weight:bold; float:right;">v{{current_app_version}}</span>
+        </div>
       </div>
-      <br>
-      <div>
-        Possible Ghost Type/s: <span>{{getPossibleGhostTypeDisplay()}}</span>
-      <div>
+      <div style="overflow:auto; height:95%; width:100%;">
+        <div style="display:inline-flex; flex-wrap:wrap; flex-direction:column; max-height:100%;">
+          <div v-for="(interaction, idx) in all_interactions.map(val => val[1])" style="flex:1; margin:2px;">
+            <input type="checkbox" :id="'interaction'+idx" :value="interaction" v-model="current_selected_interactions">
+            <label for="'interaction'+idx">{{interaction}}</label>
+          </div>
+        </div>
+      </div>
     </div>
     `
 });
