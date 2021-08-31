@@ -3,20 +3,14 @@ const app = Vue.createApp({
       return {
         all_ghost_types: ["Effigy", "Rusalka", "Demon", "Shade", "Oni", "Yurei", "Mare", "Chimera"],
         all_interactions: [
-          "Flick Light Switches",
-          "Turn Radios On/Off",
-          "Turn Alarms On/Off",
-          "Knock Books Off Bookshelf",
-          "Blow Out Candle",
-          "Turn Breaker On/Off"
+          [["effigy", "demon", "oni", "yurei", "chimera"], "Flick Light Switches"],
+          [["effigy", "rusalka", "demon", "shade", "oni"], "Turn Radios On/Off"],
+          [[], "Turn Alarms On/Off"],
+          [["effigy", "rusalka", "demon", "shade", "oni", "yurei", "mare"], "Knock Books Off Bookshelf"],
+          [["effigy", "rusalka", "shade", "oni", "yurei", "mare"], "Blow Out Candle"],
+          [["effigy", "rusalka", "demon", "chimera"], "Turn Breaker On/Off"]
         ],
         current_selected_interactions: new Array()
-        /*ghost_types: {
-          effigy: {},
-          shade: {},
-          demon: {},
-          
-        }*/
       };
     },
     created() {
@@ -31,12 +25,15 @@ const app = Vue.createApp({
     methods: {
       getAllGhostInteractions(ghost_type) {
         let interaction_list = new Array();
-        if (["effigy", "demon", "oni", "yurei", "chimera"].includes(ghost_type.toLowerCase())) interaction_list.push("Flick Light Switches");
+        for (const info of this.all_interactions) {
+          if (info[0].length == 0 || info[0].includes(ghost_type.toLowerCase())) interaction_list.push(info[1]);
+        }
+        /*if (["effigy", "demon", "oni", "yurei", "chimera"].includes(ghost_type.toLowerCase())) interaction_list.push("Flick Light Switches");
         if (["effigy", "rusalka", "demon", "shade", "oni"].includes(ghost_type.toLowerCase())) interaction_list.push("Turn Radios On/Off"); 
         interaction_list.push("Turn Alarms On/Off");
         if (["effigy", "rusalka", "demon", "shade", "oni", "yurei", "mare"].includes(ghost_type.toLowerCase())) interaction_list.push("Knock Books Off Bookshelf");
         if (["effigy", "rusalka", "shade", "oni", "yurei", "mare"].includes(ghost_type.toLowerCase())) interaction_list.push("Blow Out Candle");
-        if (["effigy", "rusalka", "demon", "chimera"].includes(ghost_type.toLowerCase())) interaction_list.push("Turn Breaker On/Off");
+        if (["effigy", "rusalka", "demon", "chimera"].includes(ghost_type.toLowerCase())) interaction_list.push("Turn Breaker On/Off");*/
         return interaction_list;
       },
       getAllPossibleGhostTypes() {
@@ -66,14 +63,10 @@ const app = Vue.createApp({
     template: `
     <div id="app-container">
       <div v-for="(interaction, idx) in all_interactions">
-        <input type="checkbox" :id="'interaction'+idx" :value="interaction" v-model="current_selected_interactions">
-        <label for="'interaction'+idx">{{interaction}}</label>
+        <input type="checkbox" :id="'interaction'+idx" :value="interaction[1]" v-model="current_selected_interactions">
+        <label for="'interaction'+idx">{{interaction[1]}}</label>
       </div>
       Possible Ghost Type/s: <span>{{getPossibleGhostTypeDisplay()}}</span>
     </div>
     `
 });
-
-//Current Ghost Type: <span>{{getAllPossibleGhostTypes()}}</span>
-//Possible Ghost Type/s: <span v-for="(ghost_type, idx) in getAllPossibleGhostTypes()">{{ghost_type + (idx != getAllPossibleGhostTypes().length - 1 ? ', ' : '.')}}</span>
-//if (ghost_type.toLowerCase() == "effigy" || ghost_type.toLowerCase() == "demon" || ghost_type.toLowerCase() == "oni" || ghost_type.toLowerCase() == "yurei" || ghost_type.toLowerCase() == "chimera")
