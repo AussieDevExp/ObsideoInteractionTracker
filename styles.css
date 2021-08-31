@@ -1,14 +1,27 @@
 * {
   user-select: none;
+  font-family: 'Open Sans', sans-serif;
 }
 
-html, body, #app, #app-container {
-  max-width: 100vw;
-  max-height: 100vh;
-  margin: 0;
-  padding: 0;
+body {
+  margin:0;
+}
+
+#app-container {
+  min-height:100vh;
+  margin:0;
+  overflow:hidden;
 }
 
 .can-be-clicked:hover {
   cursor: pointer;
+}
+
+.highlighted-lightgray-on-hover:hover {
+  background-color: lightgray;
+}
+
+.highlighted-gray-on-hover:hover {
+  background-color: gray;
+  color: white;
 }
