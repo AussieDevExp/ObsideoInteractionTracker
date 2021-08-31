@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.01",
+        current_app_version: "0.011",
         all_ghost_types: ["Effigy", "Rusalka", "Demon", "Shade", "Oni", "Yurei", "Mare", "Chimera"],
         all_interactions,
         current_selected_interactions: new Array()
@@ -59,9 +59,9 @@ const app = Vue.createApp({
       </div>
       <div style="overflow:auto; height:95%; width:100%;">
         <div style="display:inline-flex; flex-wrap:wrap; flex-direction:column; max-height:100%;">
-          <div v-for="(interaction, idx) in all_interactions.map(val => val[1])" style="flex:1; margin:2px;">
+          <div v-for="(interaction, idx) in all_interactions.map(val => val[1])" style="flex:1; margin:2px; border: 2px solid black;">
             <input type="checkbox" :id="'interaction'+idx" :value="interaction" v-model="current_selected_interactions">
-            <label for="'interaction'+idx">{{interaction}}</label>
+            <label :for="'interaction'+idx">{{interaction}}</label>
           </div>
         </div>
       </div>
