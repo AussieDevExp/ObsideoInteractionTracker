@@ -8,3 +8,7 @@ html, body, #app, #app-container {
   margin: 0;
   padding: 0;
 }
+
+.can-be-clicked:hover {
+  cursor: pointer;
+}
