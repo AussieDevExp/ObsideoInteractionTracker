@@ -1,15 +1,16 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        all_ghost_types: ["Effigy", "Rusalka", "Demon", "Shade", "Oni", "Yurei", "Mare", "Chimera"],
-        all_interactions: [
-          [["effigy", "demon", "oni", "yurei", "chimera"], "Flick Light Switches"],
-          [["effigy", "rusalka", "demon", "shade", "oni"], "Turn Radios On/Off"],
-          [[], "Turn Alarms On/Off"],
-          [["effigy", "rusalka", "demon", "shade", "oni", "yurei", "mare"], "Knock Books Off Bookshelf"],
-          [["effigy", "rusalka", "shade", "oni", "yurei", "mare"], "Blow Out Candle"],
-          [["effigy", "rusalka", "demon", "chimera"], "Turn Breaker On/Off"]
-        ],
+        all_ghost_types: {
+          "effigy": [],
+          "rusalka": [],
+          "demon": [],
+          "shade": [],
+          "oni": [],
+          "yurei": [],
+          "mare": [],
+          "chimera" []:
+        },
         current_selected_interactions: new Array()
       };
     },
@@ -28,12 +29,6 @@ const app = Vue.createApp({
         for (const info of this.all_interactions) {
           if (info[0].length == 0 || info[0].includes(ghost_type.toLowerCase())) interaction_list.push(info[1]);
         }
-        /*if (["effigy", "demon", "oni", "yurei", "chimera"].includes(ghost_type.toLowerCase())) interaction_list.push("Flick Light Switches");
-        if (["effigy", "rusalka", "demon", "shade", "oni"].includes(ghost_type.toLowerCase())) interaction_list.push("Turn Radios On/Off"); 
-        interaction_list.push("Turn Alarms On/Off");
-        if (["effigy", "rusalka", "demon", "shade", "oni", "yurei", "mare"].includes(ghost_type.toLowerCase())) interaction_list.push("Knock Books Off Bookshelf");
-        if (["effigy", "rusalka", "shade", "oni", "yurei", "mare"].includes(ghost_type.toLowerCase())) interaction_list.push("Blow Out Candle");
-        if (["effigy", "rusalka", "demon", "chimera"].includes(ghost_type.toLowerCase())) interaction_list.push("Turn Breaker On/Off");*/
         return interaction_list;
       },
       getAllPossibleGhostTypes() {
@@ -66,7 +61,10 @@ const app = Vue.createApp({
         <input type="checkbox" :id="'interaction'+idx" :value="interaction[1]" v-model="current_selected_interactions">
         <label for="'interaction'+idx">{{interaction[1]}}</label>
       </div>
-      Possible Ghost Type/s: <span>{{getPossibleGhostTypeDisplay()}}</span>
+      <br>
+      <div>
+        Possible Ghost Type/s: <span>{{getPossibleGhostTypeDisplay()}}</span>
+      <div>
     </div>
     `
 });
