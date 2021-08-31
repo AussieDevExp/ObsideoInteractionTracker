@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.014",
+        current_app_version: "0.015",
         all_ghost_types: ["Effigy", "Rusalka", "Demon", "Shade", "Oni", "Yurei", "Mare", "Chimera"],
         all_interactions,
         current_selected_interactions: new Array()
@@ -27,13 +27,9 @@ const app = Vue.createApp({
       getAllPossibleGhostTypes() {
         let possible_ghost_types = new Array();
         for (const ghost_type of this.all_ghost_types) {
-          let count = 0;
           let all_interactions_for_ghost = this.getAllGhostInteractions(ghost_type)
           let filtered_array = all_interactions_for_ghost.filter(interaction => this.current_selected_interactions.includes(interaction))
-          for (const i of all_interactions_for_ghost) {
-            if (this.current_selected_interactions.includes(i)) count++;
-          }
-          if (count == this.current_selected_interactions.length) possible_ghost_types.push(ghost_type); 
+          if (filtered_array.length == this.current_selected_interactions.length) possible_ghost_types.push(ghost_type);
         }
         return possible_ghost_types;
       },
@@ -49,19 +45,12 @@ const app = Vue.createApp({
         return string;
       },
       clearAllInteractions() {
-        /*let checkboxes = document.getElementsByClassName("interaction-checkbox");
-        for (let checkbox of checkboxes) {
-          checkbox.checked = false;
-          this.current_selected_interactions.splice(this.current_selected_interactions.indexOf(checkbox.value), 1)
-        }*/
         let checkboxes = document.getElementsByClassName("interaction-checkbox");
-        //let checked_checkboxes = checkboxes.filter(val => val.checked);
         let checked_checkboxes = Array.prototype.filter.call(checkboxes, val => val.checked);
         for (let checkbox of checked_checkboxes) {
           checkbox.checked = false;
           this.current_selected_interactions.splice(this.current_selected_interactions.indexOf(checkbox.value), 1);
         }
-        //this.current_selected_interactions = new Array();
       }
     },
     template: `
@@ -84,6 +73,3 @@ const app = Vue.createApp({
     </div>
     `
 });
-
-// TODO: make whole div change checkbox... Is there even a way to do this? lol
-// TODO: add mechanic to show the items needed for the exorcism based on ghost type (e.g. crucific and holy water).
