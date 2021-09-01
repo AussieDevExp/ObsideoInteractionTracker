@@ -45,7 +45,7 @@ let all_interactions = [
   [["demon", "chimera"], "Place a Pentagram", "Crucifix, Pentagram and/or Grave-Related"],
   [["demon", "oni", "mare"], "Scribble On Painting", "Humane Action"],
   [["shade", "yurei"], "Open Drawer", "Open/Close"],
-  [["oni", "yurei"], "Blood Writing", "Blood-Related"],
+  [["oni", "yurei", "chimera"], "Blood Writing", "Blood-Related"],
   [["oni", "yurei"], "Rain Blood", "Blood-Related"],
   [["mare"], "Create Pool of Blood", "Blood-Related"],
   [["mare", "chimera"], "Bloody Handprint", "Blood-Related"],
