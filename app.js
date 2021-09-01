@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.015",
+        current_app_version: "0.016",
         all_ghost_types: ["Effigy", "Rusalka", "Demon", "Shade", "Oni", "Yurei", "Mare", "Chimera"],
         all_interactions,
         current_selected_interactions: new Array(),
@@ -39,13 +39,21 @@ const app = Vue.createApp({
       },
       getPossibleGhostTypeDisplay() {
         let string = "";
-        for (const [idx, ghost_type] of this.getAllPossibleGhostTypes().entries()) {
-          string += ghost_type;
-          if (idx >= this.getAllPossibleGhostTypes().length - 1) continue;
-          string += idx < this.getAllPossibleGhostTypes().length - 2 ? ", " : " and ";
+        let possible_ghost_types = this.getAllPossibleGhostTypes();
+        string += `<span style='font-weight:bold;'>`;
+        if (this.current_selected_interactions.length <= 0) {
+          string += `You have not selected an interaction yet. Try selecting one to begin tracking your ghost`;
+        } else if (possible_ghost_types.length <= 0) {
+          string += `There is not a single ghost type that is possible based on your interaction selections`;
+        } else {
+          string += `</span><span>You are dealing with ${this.getSingularWordForGhost(possible_ghost_types[0])} `
+          for (const [idx, ghost_type] of possible_ghost_types.entries()) {
+            string += ghost_type;
+            if (idx >= possible_ghost_types.length - 1) continue;
+            string += idx < possible_ghost_types.length - 2 ? `, ` : ` or `;
+          }
         }
-        if (string == "") string += "None";
-        string += "."; 
+        string += `.</span>` 
         return string;
       },
       clearAllInteractions() {
@@ -55,15 +63,18 @@ const app = Vue.createApp({
           checkbox.checked = false;
           this.current_selected_interactions.splice(this.current_selected_interactions.indexOf(checkbox.value), 1);
         }
+      },
+      getSingularWordForGhost(ghost_type) {
+        let uses_a = ["Rusalka", "Demon", "Shade", "Yurei", "Mare", "Chimera"];
+        let uses_an = ["effigy", "Oni"];
+        return uses_a.includes(ghost_type) ? `a` : `an`; 
       }
     },
     template: `
     <div id="app-container" :style="{backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">
     <div id="flex-container" style="display:flex; flex-wrap:wrap; flex-shrink:0;">
       <div style="overflow:auto; text-align:center; margin:10px; display:flex; justify-content:center; flex-wrap:wrap; flex-basis:100%; flex-grow:1;" :style="{color: current_theme == 'Light' ? 'black' : 'white'}">
-        <div style="text-align:center; font-size:20px; flex-basis:100%;">
-          <span style="font-weight:bold;">Possible Ghost Type/s:</span> <span>{{getPossibleGhostTypeDisplay()}}</span>
-        </div>
+        <div style="text-align:center; font-size:20px; flex-basis:100%;" v-html="getPossibleGhostTypeDisplay()"></div>
         <div style="flex-basis:100%;">
           <span style="font-weight:bold; font-style:italic;">v{{current_app_version}}</span>
         </div>
@@ -71,7 +82,7 @@ const app = Vue.createApp({
       <div v-if="current_tab=='Tracker'" style="display:inline-flex; flex-basis:100%; flex-direction:column; gap:5px;">
           <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">Clear</div>
           <div style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:80vh; overflow:auto;">
-            <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in all_interactions.map(val => val[1])" style="margin:2px; padding:2px; flex: 0 1 2%;" :style="{border: '2px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">
+            <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in all_interactions.map(val => val[1]).sort()" style="margin:2px; padding:2px; flex: 0 1 2%;" :style="{border: '2px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">
               <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx" :value="interaction" v-model="current_selected_interactions">
               <label class="can-be-clicked" :for="'interaction'+idx" :style="{fontWeight:current_selected_interactions.includes(interaction) ? 'bold' : 'normal'}">{{interaction}}</label>
             </div>
