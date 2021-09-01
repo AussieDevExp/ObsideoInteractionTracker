@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.018",
+        current_app_version: "0.019",
         all_ghost_types,
         all_interactions,
         current_selected_interactions: new Array(),
@@ -63,12 +63,7 @@ const app = Vue.createApp({
         return string;
       },
       clearAllInteractions() {
-        let checkboxes = document.getElementsByClassName("interaction-checkbox");
-        let checked_checkboxes = Array.prototype.filter.call(checkboxes, val => val.checked);
-        for (let checkbox of checked_checkboxes) {
-          checkbox.checked = false;
-          this.current_selected_interactions.splice(this.current_selected_interactions.indexOf(checkbox.value), 1);
-        }
+        this.current_selected_interactions = new Array();
       },
       getSingularWordForGhost(ghost_type) {
         let uses_a = ["Rusalka", "Demon", "Shade", "Yurei", "Mare", "Chimera"];
@@ -101,7 +96,7 @@ const app = Vue.createApp({
         </div>
       </div>
       <div v-if="current_tab=='Tracker'" style="display:inline-flex; flex-basis:100%; flex-direction:column; gap:5px;">
-          <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">Clear</div>
+          <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">Clear All Interactions</div>
           <Categorical :isCorrectSortMethod="current_sort_method=='Categorical'" :currentTheme="current_theme" :categoryData="getGroupedInteractions()" v-model:currentInteractions="current_selected_interactions"></Categorical>
           <Alphabetical :isCorrectSortMethod="current_sort_method=='Alphabetical'" :currentTheme="current_theme" :allInteractionData="all_interactions" v-model:currentInteractions="current_selected_interactions"></Alphabetical>
       </div>
@@ -114,106 +109,4 @@ const app = Vue.createApp({
     </div>
     </div>
     `
-}); 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//flex-flow:column wrap; TODO: figure out a way to wrap but keep category text centered... seems difficult atm.
-// flex-flow:row wrap in categorical to wrap the categories.. Might change to this at some point for mobile support. I will just overflow x for now. same with column wrap on each category.
-// could add another array to interactions to have them show up differently based on the sorting type... however I would need to refactor the way I check the selected interactions. However, I think I have a pretty simple solution to this if I decide to add it.
-// could use grid for alphabetical, will think about it...
-///*[["Effigy", "Holy Water and a Rune"], ["Rusalka", "Holy Water and a Rune"], ["Demon", "a Crucifix and a Candle"], ["Shade", "Holy Water and a Candle"], ["Oni", "a Crucifix and a Possessed Doll"], ["Yurei", "Salt and a Possessed Doll"], ["Mare", "a Crucifix and a Rune"], ["Chimera", "a Crucifix and Holy Water"]]*/,
-// TODO: potentially change the way interactions are stored, by making them categorised in objects. I will think about this one. For now it isnt a huge deal.
-/*getAlphabeticalInteractionListDisplay() {
-        /*<div v-if="current_sort_method=='Alphabetical'" style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:80vh; overflow:auto; max-width:100vw;">
-              <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in all_interactions.map(val => val[1]).sort()" style="margin:2px; padding:2px; flex: 0 1 2%;" :style="{border: '2px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">
-                <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx" :value="interaction" v-model="current_selected_interactions">
-                <label class="can-be-clicked" :for="'interaction'+idx" :style="{fontWeight:current_selected_interactions.includes(interaction) ? 'bold' : 'normal'}">{{interaction}}</label>
-              </div>
-            </div>
-            string = "";
-            // set wrapper div appropriately
-            string += `<div style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:80vh; overflow:auto; max-width:100vw;">`;
-            for (const [idx, interaction] of this.all_interactions.map(val => val[1]).sort().entries()) {
-              string += `<div class="highlighted-gray-on-hover" style="margin:2px; padding:2px; flex: 0 1 2%;" :style="{border: '2px solid ' + (this.current_theme == 'Light' ? 'black' : 'white'), color: this.current_theme == 'Light' ? 'black' : 'white', backgroundColor: this.current_theme == 'Light' ? 'white' : 'black'}">`;
-              string += `<input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+${idx}" :value="${interaction}" v-model="${this.current_selected_interactions}">
-              <label class="can-be-clicked" :for="'interaction'+${idx}" :style="${{fontWeight:this.current_selected_interactions.includes(interaction) ? 'bold' : 'normal'}}">${interaction}</label>`;
-              string += "</div>";
-            }
-            string += `</div>`;
-            return string;
-          }
-          
-          <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="{color: current_theme == 'Light' ? 'black' : 'white'}">
-          Current Theme:
-          <select v-model="current_theme">
-            <option disabled value="">Select a theme!</option>
-            <option v-for="theme in theme_list">{{theme}}</option>
-          </select>
-        </div>
-        <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="{color: current_theme == 'Light' ? 'black' : 'white'}">
-          Current Tracker Sorting Method:
-          <select v-model="current_sort_method">
-            <option disabled value="">Select a sort method!</option>
-            <option v-for="sort_method in sort_method_list">{{sort_method}}</option>
-          </select>
-        </div>TODO: refactor everything lol...*/
+});
