@@ -1,12 +1,12 @@
 app.component('Alphabetical', {
-  props: ['isCorrectSortMethod', 'binded_styles', 'currentTheme', 'allInteractionData', 'currentInteractions'],
+  props: ['isCorrectSortMethod', 'binded_styles', 'currentThemeData', 'allInteractionData', 'currentInteractions'],
   emits: ['update:currentInteractions'],
   data() {
     return {
       interaction_container_styling: {
-        border: '2px solid ' + (this.currentTheme == 'Light' ? 'black' : 'white'), 
-        color: this.currentTheme == 'Light' ? 'black' : 'white', 
-        backgroundColor: this.currentTheme == 'Light' ? 'white' : 'black'
+        border: '2px solid ' + this.currentThemeData.borderColor, 
+        color: this.currentThemeData.textColor, 
+        backgroundColor: this.currentThemeData.backgroundColor
       }
     }
   },
@@ -34,22 +34,22 @@ app.component('Alphabetical', {
 });
 
 app.component('Categorical', {
-  props: ['isCorrectSortMethod', 'categoryData', 'currentInteractions', 'currentTheme'],
+  props: ['isCorrectSortMethod', 'categoryData', 'currentInteractions', 'currentThemeData'],
   emits: ['update:currentInteractions'],
   data() {
     return {
       interaction_container_styling: {
-        border: '2px solid ' + (this.currentTheme == 'Light' ? 'black' : 'white'), 
-        color: this.currentTheme == 'Light' ? 'black' : 'white', 
-        backgroundColor: this.currentTheme == 'Light' ? 'white' : 'black'
+        border: '2px solid ' + this.currentThemeData.borderColor, 
+        color: this.currentThemeData.textColor, 
+        backgroundColor: this.currentThemeData.backgroundColor
       },
       category_name_styling: {
-        color: this.currentTheme == 'Light' ? 'black' : 'white'
+        color: this.currentThemeData.textColor
       },
       clear_button_styling: {
-        border: '3px solid ' + (this.currentTheme == 'Light' ? 'black' : 'white'), 
-        color: this.currentTheme == 'Light' ? 'black' : 'white', 
-        backgroundColor: this.currentTheme == 'Light' ? 'white' : 'black'
+        border: '3px solid ' + this.currentThemeData.borderColor, 
+        color: this.currentThemeData.textColor, 
+        backgroundColor: this.currentThemeData.backgroundColor
       }
     }
   },
@@ -90,12 +90,12 @@ app.component('Categorical', {
 });
 
 app.component('Basic-Setting-Dropdown', {
-  props: ['disabledOptionValue', 'optionList', 'settingMainText', 'currentTheme', 'optionValue'],
+  props: ['disabledOptionValue', 'optionList', 'settingMainText', 'currentThemeData', 'optionValue'],
   emits: ['update:optionValue'],
   data() {
     return {
       main_styling: {
-        color: this.currentTheme == 'Light' ? 'black' : 'white'
+        color: this.currentThemeData.textColor
       }
     }
   },

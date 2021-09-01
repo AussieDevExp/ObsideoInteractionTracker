@@ -4,9 +4,10 @@ const app = Vue.createApp({
         current_app_version: "0.019",
         all_ghost_types,
         all_interactions,
+        theme_data,
         current_selected_interactions: new Array(),
         tab_list: ["Tracker", "Settings"],
-        theme_list: ["Light", "Dark"],
+        theme_list: ["Light", "Dark", "Grayscale"],
         sort_method_list: ["Alphabetical", "Categorical"],
         setting_text_list: ["Current Theme", "Current Interaction Sorting Method"],
         setting_disabled_option_text_list: ["Select a theme!", "Select a sorting method!"],
@@ -86,25 +87,30 @@ const app = Vue.createApp({
         return [this.theme_list, this.sort_method_list];
       }
     },
+    computed: {
+      getCurrentThemeData() {
+        return this.theme_data[this.current_theme.toLowerCase()];
+      }
+    },
     template: `
-    <div id="app-container" :style="{backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">
+    <div id="app-container" :style="{backgroundColor: getCurrentThemeData.backgroundColor}">
     <div id="flex-container" style="display:flex; flex-wrap:wrap; flex-shrink:0;">
-      <div style="overflow:auto; text-align:center; margin:10px; display:flex; justify-content:center; flex-wrap:wrap; flex-basis:100%; flex-grow:1;" :style="{color: current_theme == 'Light' ? 'black' : 'white'}">
+      <div style="overflow:auto; text-align:center; margin:10px; display:flex; justify-content:center; flex-wrap:wrap; flex-basis:100%; flex-grow:1;" :style="{color: getCurrentThemeData.textColor}">
         <div v-html="getPossibleGhostTypeDisplay()"></div>
         <div style="flex-basis:100%;">
           <span style="font-weight:bold; font-style:italic;">v{{current_app_version}}</span>
         </div>
       </div>
       <div v-if="current_tab=='Tracker'" style="display:inline-flex; flex-basis:100%; flex-direction:column; gap:5px;">
-          <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">Clear All Interactions</div>
-          <Categorical :isCorrectSortMethod="current_sort_method=='Categorical'" :currentTheme="current_theme" :categoryData="getGroupedInteractions()" v-model:currentInteractions="current_selected_interactions"></Categorical>
-          <Alphabetical :isCorrectSortMethod="current_sort_method=='Alphabetical'" :currentTheme="current_theme" :allInteractionData="all_interactions" v-model:currentInteractions="current_selected_interactions"></Alphabetical>
+          <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">Clear All Interactions</div>
+          <Categorical :isCorrectSortMethod="current_sort_method=='Categorical'" :currentThemeData="getCurrentThemeData" :categoryData="getGroupedInteractions()" v-model:currentInteractions="current_selected_interactions"></Categorical>
+          <Alphabetical :isCorrectSortMethod="current_sort_method=='Alphabetical'" :currentThemeData="getCurrentThemeData" :allInteractionData="all_interactions" v-model:currentInteractions="current_selected_interactions"></Alphabetical>
       </div>
       <div v-if="current_tab=='Settings'" style="display:flex; flex-wrap:wrap; flex-basis:100%; flex-direction:row; margin:auto; align-items:center; gap:10px;">
-        <Basic-Setting-Dropdown v-for="(_, idx) in new Array(2)" :optionList="getAllOptionLists()[idx]" :disabledOptionValue="setting_disabled_option_text_list[idx]" :settingMainText="setting_text_list[idx]" v-model:currentTheme="current_theme" v-model:optionValue="this[all_option_values[idx]]" :key="current_theme + idx"></Basic-Setting-Dropdown>
+        <Basic-Setting-Dropdown v-for="(_, idx) in new Array(2)" :optionList="getAllOptionLists()[idx]" :disabledOptionValue="setting_disabled_option_text_list[idx]" :settingMainText="setting_text_list[idx]" :currentThemeData="getCurrentThemeData" v-model:optionValue="this[all_option_values[idx]]" :key="current_theme + idx"></Basic-Setting-Dropdown>
       </div>
-      <div style="display:flex; flex-direction:row; margin:auto; flex-wrap:wrap; place-content:center; padding:10px; flex-basis:100%;" :style="{color: current_theme == 'Light' ? 'black' : 'white'}">
-        <div class="can-be-clicked highlighted-lightgray-on-hover" v-for="tab in tab_list" @click="current_tab=tab" style="margin:3px; border-radius:10px; padding:3px;" :style="{border: '3px solid ' + (current_theme == 'Light' ? 'black' : 'white'), color: current_theme == 'Light' ? 'black' : 'white', backgroundColor: current_theme == 'Light' ? 'white' : 'black'}">{{tab}}</div>
+      <div style="display:flex; flex-direction:row; margin:auto; flex-wrap:wrap; place-content:center; padding:10px; flex-basis:100%;" :style="{color: getCurrentThemeData.textColor}">
+        <div class="can-be-clicked highlighted-lightgray-on-hover" v-for="tab in tab_list" @click="current_tab=tab" style="margin:3px; border-radius:10px; padding:3px;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">{{tab}}</div>
       </div>
     </div>
     </div>
