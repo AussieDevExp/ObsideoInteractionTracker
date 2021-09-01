@@ -42,7 +42,7 @@ const app = Vue.createApp({
         } else if (possible_ghost_types.length <= 0) {
           string += `There is not a single ghost type that is possible based on your interaction selections`;
         } else {
-          string += `</span><span style="font-size:20px;">You are dealing with ${this.getSingularWordForGhost(possible_ghost_types[0])} `
+          string += `</span><span style="font-size:20px;">You are dealing with ${this.getSingularWordForGhost(possible_ghost_types[0][0])} `;
           for (const [idx, ghost_type] of possible_ghost_types.map(val => val[0]).entries()) {
             string += ghost_type;
             if (idx >= possible_ghost_types.length - 1) continue;
