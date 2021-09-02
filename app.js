@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.019",
+        current_app_version: "0.02",
         all_ghost_types,
         all_interactions,
         theme_data,
@@ -14,7 +14,9 @@ const app = Vue.createApp({
         all_option_values: ['current_theme', 'current_sort_method'],
         current_tab: "Tracker",
         current_theme: "Light",
-        current_sort_method: "Alphabetical"
+        current_sort_method: "Alphabetical",
+        should_show_interaction_markers: true,
+        force_rerender: false
       };
     },
     methods: {
@@ -65,31 +67,45 @@ const app = Vue.createApp({
       },
       clearAllInteractions() {
         this.current_selected_interactions = new Array();
+        this.force_rerender = !this.force_rerender;
       },
       getSingularWordForGhost(ghost_type) {
         let uses_a = ["Rusalka", "Demon", "Shade", "Yurei", "Mare", "Chimera"];
         let uses_an = ["effigy", "Oni"];
         return uses_a.includes(ghost_type) ? `a` : `an`; 
       },
-      getGroupedInteractions() {
-        let unique_categories = new Array();
-        let final_category_inputs = new Array();
-        for (let category of this.all_interactions.map(val => val[2])) {
-          if (unique_categories.includes(category)) continue;
-          unique_categories.push(category);
-        }
-        for (let category of unique_categories) {
-          final_category_inputs.push([category, this.all_interactions.filter(val => val[2] == category).map(val => val[1])]);
-        }
-        return final_category_inputs;
-      },
       getAllOptionLists() {
         return [this.theme_list, this.sort_method_list];
+      },
+      forceRerender() {
+        this.force_rerender = !this.force_rerender;
+      },
+      changeShowInteractionMarkerOption() {
+        this.should_show_interaction_markers = !this.should_show_interaction_markers;
+        this.forceRerender();
       }
     },
     computed: {
       getCurrentThemeData() {
         return this.theme_data[this.current_theme.toLowerCase()];
+      },
+      getSortingMethodData() {
+        return {
+          "alphabetical": {
+            possible_ghost_types: this.getAllPossibleGhostTypes(),
+            is_correct_sort_method: this.current_sort_method == 'Alphabetical',
+            current_theme_data: this.getCurrentThemeData,
+            interaction_data: this.all_interactions,
+            show_interaction_markers: this.should_show_interaction_markers
+          },
+          "categorical": {
+            possible_ghost_types: this.getAllPossibleGhostTypes(),
+            is_correct_sort_method: this.current_sort_method == 'Categorical',
+            current_theme_data: this.getCurrentThemeData,
+            interaction_data: this.all_interactions,
+            show_interaction_markers: this.should_show_interaction_markers 
+          }
+        };
       }
     },
     template: `
@@ -103,11 +119,18 @@ const app = Vue.createApp({
       </div>
       <div v-if="current_tab=='Tracker'" style="display:inline-flex; flex-basis:100%; flex-direction:column; gap:5px;">
           <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">Clear All Interactions</div>
-          <Categorical :isCorrectSortMethod="current_sort_method=='Categorical'" :currentThemeData="getCurrentThemeData" :categoryData="getGroupedInteractions()" v-model:currentInteractions="current_selected_interactions"></Categorical>
-          <Alphabetical :isCorrectSortMethod="current_sort_method=='Alphabetical'" :currentThemeData="getCurrentThemeData" :allInteractionData="all_interactions" v-model:currentInteractions="current_selected_interactions"></Alphabetical>
+          <Categorical v-model:data="getSortingMethodData['categorical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="force_rerender"></Categorical>
+          <Alphabetical v-model:data="getSortingMethodData['alphabetical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="force_rerender"></Alphabetical>
       </div>
       <div v-if="current_tab=='Settings'" style="display:flex; flex-wrap:wrap; flex-basis:100%; flex-direction:row; margin:auto; align-items:center; gap:10px;">
         <Basic-Setting-Dropdown v-for="(_, idx) in new Array(2)" :optionList="getAllOptionLists()[idx]" :disabledOptionValue="setting_disabled_option_text_list[idx]" :settingMainText="setting_text_list[idx]" :currentThemeData="getCurrentThemeData" v-model:optionValue="this[all_option_values[idx]]" :key="current_theme + idx"></Basic-Setting-Dropdown>
+        <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="{color: this.getCurrentThemeData.textColor}">
+          <div style="flex:1 0 100%;">Show Interaction Markers</div>
+          <div style="flex:1 0 100%;">
+            <input class="can-be-clicked" type="checkbox" id="x" :value="should_show_interaction_markers" @input="changeShowInteractionMarkerOption" v-model="should_show_interaction_markers">
+            <label class="can-be-clicked" for="x">{{should_show_interaction_markers ? "Enabled" : "Disabled"}}</label>
+          </div>
+        </div>
       </div>
       <div style="display:flex; flex-direction:row; margin:auto; flex-wrap:wrap; place-content:center; padding:10px; flex-basis:100%;" :style="{color: getCurrentThemeData.textColor}">
         <div class="can-be-clicked highlighted-lightgray-on-hover" v-for="tab in tab_list" @click="current_tab=tab" style="margin:3px; border-radius:10px; padding:3px;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">{{tab}}</div>

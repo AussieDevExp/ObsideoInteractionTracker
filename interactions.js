@@ -1,4 +1,4 @@
-let all_interactions = [
+let all_interactions = [ //TODO: Refactor these :):):)
   [["effigy", "demon", "oni", "yurei", "chimera"], "Flick Light Switch On/Off", "On/Off"],
   [["effigy", "rusalka", "demon", "shade", "oni"], "Turn Radio On/Off", "On/Off"],
   [[], "Turn Alarm On/Off", "On/Off"],
