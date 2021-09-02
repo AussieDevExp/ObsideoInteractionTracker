@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.02",
+        current_app_version: "0.021",
         all_ghost_types,
         all_interactions,
         theme_data,
@@ -9,12 +9,14 @@ const app = Vue.createApp({
         tab_list: ["Tracker", "Settings"],
         theme_list: ["Light", "Dark", "Grayscale"],
         sort_method_list: ["Alphabetical", "Categorical"],
-        setting_text_list: ["Current Theme", "Current Interaction Sorting Method"],
-        setting_disabled_option_text_list: ["Select a theme!", "Select a sorting method!"],
-        all_option_values: ['current_theme', 'current_sort_method'],
+        interaction_marker_placements: ["Left", "Right"],
+        setting_text_list: ["Current Theme", "Current Interaction Sorting Method", "Current Interaction Marker Placement"],
+        setting_disabled_option_text_list: ["Select a theme!", "Select a sorting method!", "Select an interaction marker position!"],
+        all_option_values: ['current_theme', 'current_sort_method', 'current_interaction_marker_placement'],
         current_tab: "Tracker",
         current_theme: "Light",
         current_sort_method: "Alphabetical",
+        current_interaction_marker_placement: "Left",
         should_show_interaction_markers: true,
         force_rerender: false
       };
@@ -75,7 +77,10 @@ const app = Vue.createApp({
         return uses_a.includes(ghost_type) ? `a` : `an`; 
       },
       getAllOptionLists() {
-        return [this.theme_list, this.sort_method_list];
+        return [this.theme_list, this.sort_method_list, this.interaction_marker_placements];
+      },
+      getOptionBools() {
+        return [true, true, this.should_show_interaction_markers];
       },
       forceRerender() {
         this.force_rerender = !this.force_rerender;
@@ -96,14 +101,16 @@ const app = Vue.createApp({
             is_correct_sort_method: this.current_sort_method == 'Alphabetical',
             current_theme_data: this.getCurrentThemeData,
             interaction_data: this.all_interactions,
-            show_interaction_markers: this.should_show_interaction_markers
+            show_interaction_markers: this.should_show_interaction_markers,
+            interaction_marker_position: this.current_interaction_marker_placement
           },
           "categorical": {
             possible_ghost_types: this.getAllPossibleGhostTypes(),
             is_correct_sort_method: this.current_sort_method == 'Categorical',
             current_theme_data: this.getCurrentThemeData,
             interaction_data: this.all_interactions,
-            show_interaction_markers: this.should_show_interaction_markers 
+            show_interaction_markers: this.should_show_interaction_markers,
+            interaction_marker_position: this.current_interaction_marker_placement 
           }
         };
       }
@@ -123,7 +130,7 @@ const app = Vue.createApp({
           <Alphabetical v-model:data="getSortingMethodData['alphabetical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="force_rerender"></Alphabetical>
       </div>
       <div v-if="current_tab=='Settings'" style="display:flex; flex-wrap:wrap; flex-basis:100%; flex-direction:row; margin:auto; align-items:center; gap:10px;">
-        <Basic-Setting-Dropdown v-for="(_, idx) in new Array(2)" :optionList="getAllOptionLists()[idx]" :disabledOptionValue="setting_disabled_option_text_list[idx]" :settingMainText="setting_text_list[idx]" :currentThemeData="getCurrentThemeData" v-model:optionValue="this[all_option_values[idx]]" :key="current_theme + idx"></Basic-Setting-Dropdown>
+        <Basic-Setting-Dropdown v-for="(_, idx) in new Array(getAllOptionLists().length)" :optionList="getAllOptionLists()[idx]" :bool="getOptionBools()[idx]" :disabledOptionValue="setting_disabled_option_text_list[idx]" :settingMainText="setting_text_list[idx]" :currentThemeData="getCurrentThemeData" v-model:optionValue="this[all_option_values[idx]]" v-model:reRender="force_rerender" :key="force_rerender+'setting'+idx"></Basic-Setting-Dropdown>
         <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="{color: this.getCurrentThemeData.textColor}">
           <div style="flex:1 0 100%;">Show Interaction Markers</div>
           <div style="flex:1 0 100%;">

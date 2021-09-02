@@ -8,12 +8,17 @@ app.component('Alphabetical', {
         color: this.data.current_theme_data.textColor, 
         backgroundColor: this.data.current_theme_data.backgroundColor
       },
+      unsorted_interaction_names: this.data.interaction_data.map(val => val[1]),
+      sorted_interaction_names: this.data.interaction_data.map(val => val[1]).sort(),
       interaction_text_styling: this.data.interaction_data.map(val => ({fontWeight: this.currentInteractions.includes(val[1]) ? 'bold' : 'normal'})),
       all_possible_interactions: this.getAllPossibleInteractions()
     }
   },
   created() {
-    this.interaction_marker_list = this.data.interaction_data.map(val => this.all_possible_interactions.includes(val[1]) && this.data.show_interaction_markers ? '<!>' : '');
+    this.interaction_marker_list = this.sorted_interaction_names.map(val => this.all_possible_interactions.includes(val) && this.data.show_interaction_markers ? '>!<' : '');
+  
+    let couples = this.sorted_interaction_names.map((val, idx) => [val, this.interaction_marker_list[idx]]);
+    this.interaction_and_marker_couples = couples.map(val => `${(this.data.interaction_marker_position == "Left" ? "<b>"+val[1]+"</b> " : "")}${val[0]}${(this.data.interaction_marker_position == "Right" ? " <b>"+val[1]+"</b>" : "")}`);
   },
   methods: {
     updateCurrentInteractions(value) {
@@ -24,14 +29,14 @@ app.component('Alphabetical', {
       this.$emit('update:reRender', !this.reRender);
     },
     getAllPossibleInteractions() {
-      return this.currentInteractions.length > 0 && this.data.possible_ghost_types.length > 1 ? this.data.interaction_data.filter(val => this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase()))).map(val => val[1]) : new Array();
+      return this.currentInteractions.length > 0 && this.data.possible_ghost_types.length > 1 ? this.data.interaction_data.filter(val => val[0].length == 0 || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase()))).map(val => val[1]) : new Array();
     }
   },
   template: `
   <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:80vh; overflow:auto; max-width:100vw;">
-    <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in data.interaction_data.map(val => val[1]).sort()" style="margin:2px; padding:2px; flex: 0 1 2%;" :style="interaction_container_styling">
+    <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in sorted_interaction_names" style="margin:2px; padding:2px; flex: 0 0 2%;" :style="interaction_container_styling">
       <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx" :value="interaction" :checked="currentInteractions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
-      <label class="can-be-clicked" :for="'interaction'+idx" :style="interaction_text_styling[data.interaction_data.map(val => val[1]).indexOf(interaction)]">{{interaction}} <span style="font-weight:bold;">{{interaction_marker_list[data.interaction_data.map(val => val[1]).indexOf(interaction)]}}</span></label>
+      <label class="can-be-clicked" :for="'interaction'+idx" :style="interaction_text_styling[unsorted_interaction_names.indexOf(interaction)]" v-html="interaction_and_marker_couples[sorted_interaction_names.indexOf(interaction)]"></label>
     </div>
   </div>
   `
@@ -55,12 +60,14 @@ app.component('Categorical', {
         color: this.data.current_theme_data.textColor, 
         backgroundColor: this.data.current_theme_data.backgroundColor
       },
+      unsorted_interaction_names: this.data.interaction_data.map(val => val[1]),
+      sorted_interaction_names: this.data.interaction_data.map(val => val[1]).sort(),
       interaction_text_styling: this.data.interaction_data.map(val => ({fontWeight: this.currentInteractions.includes(val[1]) ? 'bold' : 'normal'})),
       all_possible_interactions: this.getAllPossibleInteractions()
     }
   },
   created() {
-    this.interaction_marker_list = this.data.interaction_data.map(val => this.all_possible_interactions.includes(val[1]) && this.data.show_interaction_markers ? '<!>' : '');
+    this.interaction_marker_list = this.data.interaction_data.map(val => [val[1], this.all_possible_interactions.includes(val[1]) && this.data.show_interaction_markers ? '>!<' : '']).map(val => `${(this.data.interaction_marker_position == "Left" ? "<b>"+val[1] + "</b> " : "")}${val[0]}${(this.data.interaction_marker_position == "Right" ? " <b>" + val[1]+"</b>" : "")}`);
   },
   methods: {
     updateCurrentInteractions(value) {
@@ -79,7 +86,7 @@ app.component('Categorical', {
       this.$emit('update:reRender', !this.reRender);
     },
     getAllPossibleInteractions() {
-      return this.currentInteractions.length > 0 && this.data.possible_ghost_types.length > 1 ? this.data.interaction_data.filter(val => this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase()))).map(val => val[1]) : new Array();
+      return this.currentInteractions.length > 0 && this.data.possible_ghost_types.length > 1 ? this.data.interaction_data.filter(val => val[0].length == 0 || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase()))).map(val => val[1]) : new Array();
     },
     getGroupedInteractions() {
       let unique_categories = new Array();
@@ -102,7 +109,7 @@ app.component('Categorical', {
       <div style="display:inline-flex; flex-flow:column; flex: 1 1 auto; overflow:auto; max-height:100%;">
         <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in interactions[1].sort()" style="margin:2px; padding:2px;" :style="interaction_container_styling">
           <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx+idx2" :value="interaction" :checked="currentInteractions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
-          <label class="can-be-clicked" :for="'interaction'+idx+idx2" :style="interaction_text_styling[data.interaction_data.map(val => val[1]).indexOf(interaction)]">{{interaction}} <span style="font-weight:bold;">{{interaction_marker_list[data.interaction_data.map(val => val[1]).indexOf(interaction)]}}</span></label>
+          <label class="can-be-clicked" :for="'interaction'+idx+idx2" :style="interaction_text_styling[unsorted_interaction_names.indexOf(interaction)]" v-html="interaction_marker_list[unsorted_interaction_names.indexOf(interaction)]"></label>
         </div>
       </div>
     </div>
@@ -111,8 +118,8 @@ app.component('Categorical', {
 });
 
 app.component('Basic-Setting-Dropdown', {
-  props: ['disabledOptionValue', 'optionList', 'settingMainText', 'currentThemeData', 'optionValue'],
-  emits: ['update:optionValue'],
+  props: ['disabledOptionValue', 'optionList', 'settingMainText', 'currentThemeData', 'optionValue', 'bool', 'reRender'],
+  emits: ['update:optionValue', 'update:reRender'],
   data() {
     return {
       main_styling: {
@@ -123,10 +130,11 @@ app.component('Basic-Setting-Dropdown', {
   methods: {
     changeOptionValue(value) {
       this.$emit('update:optionValue', value);
+      this.$emit('update:reRender', !this.reRender);
     }
   },
   template: `
-  <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="main_styling">
+  <div v-if="bool" style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="main_styling">
     {{settingMainText}}:
     <select :value="optionValue" @input="changeOptionValue($event.target.value)">
       <option disabled value="">{{disabledOptionValue}}</option>

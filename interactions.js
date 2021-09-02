@@ -64,3 +64,7 @@ let all_interactions = [ //TODO: Refactor these :):):)
   [["chimera"], "Duplicate Household Item", "Manipulation"],
   [["chimera"], "Spike Players Heart Rate", "Ghostly Action"]
 ];
+
+/*let all_interactions_refactored = {
+
+}*/
