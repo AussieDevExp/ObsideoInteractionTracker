@@ -49,6 +49,9 @@ app.component('Alphabetical', {
     <div v-else-if="data.possible_ghost_types.length == 0 && data.interaction_filtering_method == 'Visibility'" style="text-align:center;" :style="{color: data.current_theme_data.textColor}">
       <b>You have switched to visibility mode when no results have been received. Please clear and try again!</b>
     </div>
+    <div v-else-if="data.interaction_name_search.length != 0 && getFilteredInteractionList().length == 0" style="text-align:center;" :style="{color: data.current_theme_data.textColor}">
+      <b>Your search matched 0 interactions. Please try again!</b>
+    </div>
     <div v-else class="highlighted-gray-on-hover" v-for="(interaction, idx) in getEndInteractionList()" style="margin:2px; padding:2px; flex: 0 0 2%;" :style="interaction_container_styling">
       <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx" :value="interaction" :checked="currentInteractions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
       <label class="can-be-clicked" :for="'interaction'+idx" :style="interaction_text_styling[unsorted_interaction_names.indexOf(interaction)]" v-html="interaction_and_marker_couples[sorted_interaction_names.indexOf(interaction)]"></label>
@@ -103,7 +106,7 @@ app.component('Categorical', {
     },
     getAllPossibleInteractions() {
       //let x = this.data.interaction_filtering_method == "Visibility" ? true : this.currentInteractions.length > 0 && this.data.possible_ghost_types.length != 1;
-      return this.currentInteractions.length > 0 && this.data.possible_ghost_types.length > 1 ? this.data.interaction_data.filter(val => val[0].length == 0 || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase()))).map(val => val[1]) : new Array();
+      return this.currentInteractions.length > 0 && this.data.possible_ghost_types.length >= 1 ? this.data.interaction_data.filter(val => val[0].length == 0 || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase()))).map(val => val[1]) : new Array();
     },
     getGroupedInteractions() {
       let unique_categories = new Array();
@@ -113,7 +116,7 @@ app.component('Categorical', {
         unique_categories.push(category);
       }
       for (let category of unique_categories) {
-        final_category_inputs.push([category, this.data.interaction_data.filter(val => val[2] == category).map(val => val[1]).filter(val => this.data.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true).filter(val => val.toLowerCase().replace(/ /g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/ /g, '')))]);
+        final_category_inputs.push([category, this.data.interaction_data.filter(val => val[2] == category).map(val => val[1]).filter(val => this.data.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, '')))]);
         //.filter(val => val.toLowerCase().replace(/ /g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/ /g, '')))
         //(this.data.possible_ghost_types.length > 1 && !this.data.show_found_text) && (this.data.possible_ghost_types.length == 0 || this.data.show_found_text)
       }
@@ -130,6 +133,9 @@ app.component('Categorical', {
     </div>
     <div v-else-if="data.possible_ghost_types.length == 0 && data.interaction_filtering_method == 'Visibility'" style="text-align:center;" :style="{color: data.current_theme_data.textColor}">
       <b>You have switched to visibility mode when no results have been received. Please clear and try again!</b>
+    </div>
+    <div v-else-if="data.interaction_name_search.length != 0 && getGroupedInteractions().length == 0" style="text-align:center;" :style="{color: data.current_theme_data.textColor}">
+      <b>Your search matched 0 interactions. Please try again!</b>
     </div>
     <div v-else style="display:flex; flex-flow:row wrap; overflow:auto; justify-content:center; max-height:100%;">
       <div v-for="(interactions, idx2) in getGroupedInteractions()" style="max-height:100%; flex: 1 1 auto; display:flex; flex-direction:column;">
