@@ -8,7 +8,7 @@ let all_interactions = [ //TODO: Refactor these :):):)
   [["effigy", "rusalka", "demon", "oni", "chimera"], "Stab Bloody Knife In Wall", "Knife-Related"],
   [["yurei", "mare"], "Smash Wall", "Violent Action"],
   [["effigy", "rusalka", "demon", "shade", "oni", "chimera"], "Open/Close Door", "Open/Close"],
-  [[], "Rock Rocking Chair", "Smash"],
+  [[], "Rock Rocking Chair", "Humane Action"],
   [["effigy", "rusalka", "demon", "shade", "oni", "mare", "chimera"], "Turn Television On/Off", "On/Off"],
   [["effigy", "rusalka", "demon", "shade", "oni", "mare", "chimera"], "Turn Kettle On/Off", "On/Off"],
   [["effigy", "rusalka", "demon", "shade", "oni", "mare"], "Knock Painting Off Wall", "Object Movement"],
