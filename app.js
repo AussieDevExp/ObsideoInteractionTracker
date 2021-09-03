@@ -127,7 +127,8 @@ const app = Vue.createApp({
             interaction_marker_position: this.interaction_marker_position.current,
             interaction_filtering_method: this.interaction_filtering_method.current,
             interaction_name_search: this.interaction_name_search.current,
-            ghosts_to_filter: this.ghosts_to_filter.current
+            ghosts_to_filter: this.ghosts_to_filter.current,
+            all_ghost_types: Object.keys(this.all_ghost_types)
           },
           "categorical": {
             possible_ghost_types: this.getAllPossibleGhostTypes(),
@@ -139,7 +140,8 @@ const app = Vue.createApp({
             interaction_marker_position: this.interaction_marker_position.current,
             interaction_filtering_method: this.interaction_filtering_method.current,
             interaction_name_search: this.interaction_name_search.current,
-            ghosts_to_filter: this.ghosts_to_filter.current
+            ghosts_to_filter: this.ghosts_to_filter.current,
+            all_ghost_types: Object.keys(this.all_ghost_types)
           }
         };
       },

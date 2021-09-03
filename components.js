@@ -33,12 +33,12 @@ app.component('Alphabetical', {
       return this.data.interaction_data.filter(val => (val[0].length == 0 && this.data.possible_ghost_types.length != 0) || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase())));
     },
     getFilteredInteractionList() {
+      let t = (val) => {
+        return this.data.interaction_data[this.data.interaction_data.map(val2 => [val2[1], val2[0]]).map(val2 => val2[0]).indexOf(val)][0].length != 0 ? this.data.interaction_data[this.data.interaction_data.map(val2 => [val2[1], val2[0]]).map(val2 => val2[0]).indexOf(val)][0] : this.data.all_ghost_types
+      }
       return (this.data.interaction_filtering_method == "Visibility" ? this.data.interaction_data.filter(val => this.all_possible_interactions.map(val => val[1]).includes(val[1]) || this.currentInteractions.length == 0).map(val => val[1]).sort() : this.sorted_interaction_names).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, '')))
         .filter(val => 
-          this.data.ghosts_to_filter.length != 0 ? this.data.ghosts_to_filter.some(
-            val3 => this.data.interaction_data[this.data.interaction_data.map(
-              val2 => [val2[1], val2[0]])
-                .map(val2 => val2[0]).indexOf(val)][0].includes(val3)) : true);
+          this.data.ghosts_to_filter.length != 0 ? this.data.ghosts_to_filter.some(val3 => (!this.data.possible_ghost_types.includes(val3) ? t(val).includes(val3) : true)) : true);
     },
     getEndInteractionList() {
       return this.getFilteredInteractionList();
@@ -118,12 +118,12 @@ app.component('Categorical', {
         if (unique_categories.includes(category)) continue;
         unique_categories.push(category);
       }
+      let t = (val) => {
+        return this.data.interaction_data[this.data.interaction_data.map(val2 => [val2[1], val2[0]]).map(val2 => val2[0]).indexOf(val)][0].length != 0 ? this.data.interaction_data[this.data.interaction_data.map(val2 => [val2[1], val2[0]]).map(val2 => val2[0]).indexOf(val)][0] : this.data.all_ghost_types
+      }
       for (let category of unique_categories) {
         final_category_inputs.push([category, this.data.interaction_data.filter(val => val[2] == category).map(val => val[1]).filter(val => this.data.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, ''))).filter(val => 
-          this.data.ghosts_to_filter.length != 0 ? this.data.ghosts_to_filter.some(
-            val3 => this.data.interaction_data[this.data.interaction_data.map(
-              val2 => [val2[1], val2[0]])
-                .map(val2 => val2[0]).indexOf(val)][0].includes(val3)) : true)]);
+          this.data.ghosts_to_filter.length != 0 ? this.data.ghosts_to_filter.some(val3 => (!this.data.possible_ghost_types.includes(val3) ? t(val).includes(val3) : true)) : true)]);
         //.filter(val => val.toLowerCase().replace(/ /g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/ /g, '')))
         //(this.data.possible_ghost_types.length > 1 && !this.data.show_found_text) && (this.data.possible_ghost_types.length == 0 || this.data.show_found_text)
       }
