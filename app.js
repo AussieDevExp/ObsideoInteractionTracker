@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.021",
+        current_app_version: "0.022",
         all_ghost_types,
         all_interactions,
         theme_data,
@@ -31,6 +31,9 @@ const app = Vue.createApp({
         },
         interaction_name_search: {
           current: ""
+        },
+        ghosts_to_filter: {
+          current: new Array()
         },
         //should_show_interaction_markers: true,
         force_rerender: false
@@ -123,7 +126,8 @@ const app = Vue.createApp({
             //show_interaction_markers: this.should_show_interaction_markers,
             interaction_marker_position: this.interaction_marker_position.current,
             interaction_filtering_method: this.interaction_filtering_method.current,
-            interaction_name_search: this.interaction_name_search.current
+            interaction_name_search: this.interaction_name_search.current,
+            ghosts_to_filter: this.ghosts_to_filter.current
           },
           "categorical": {
             possible_ghost_types: this.getAllPossibleGhostTypes(),
@@ -134,7 +138,8 @@ const app = Vue.createApp({
             //show_interaction_markers: this.should_show_interaction_markers,
             interaction_marker_position: this.interaction_marker_position.current,
             interaction_filtering_method: this.interaction_filtering_method.current,
-            interaction_name_search: this.interaction_name_search.current
+            interaction_name_search: this.interaction_name_search.current,
+            ghosts_to_filter: this.ghosts_to_filter.current
           }
         };
       },
@@ -153,7 +158,8 @@ const app = Vue.createApp({
       </div>
       <div v-if="tab.current=='Tracker'" style="display:inline-flex; flex-basis:100%; flex-direction:column; gap:5px;">
           <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">Clear All Interactions</div>
-          <input style="text-align:center; max-width: 150px; border: 2.5px solid black; border-radius:5px; margin:auto;" v-model="interaction_name_search.current" placeholder="Interaction Name">
+          <Ghost-Filter :allGhostTypes="Object.keys(all_ghost_types)" :themeData="getCurrentThemeData" v-model:filteredGhostList="ghosts_to_filter.current"></Ghost-Filter>
+          <input class="search-box" style="text-align:center; max-width: 150px; border-radius:5px; margin:auto;" :style="{color: getCurrentThemeData.textColor, '--placeholder-color': getCurrentThemeData.textColor, border: '3px solid ' + getCurrentThemeData.borderColor, backgroundColor: getCurrentThemeData.backgroundColor}" v-model="interaction_name_search.current" placeholder="Interaction Name">
           <Categorical v-model:data="getSortingMethodData['categorical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="force_rerender"></Categorical>
           <Alphabetical v-model:data="getSortingMethodData['alphabetical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="force_rerender"></Alphabetical>
       </div>

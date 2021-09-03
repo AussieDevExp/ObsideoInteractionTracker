@@ -33,16 +33,19 @@ app.component('Alphabetical', {
       return this.data.interaction_data.filter(val => (val[0].length == 0 && this.data.possible_ghost_types.length != 0) || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase())));
     },
     getFilteredInteractionList() {
-      return (this.data.interaction_filtering_method == "Visibility" ? this.data.interaction_data.filter(val => this.all_possible_interactions.map(val => val[1]).includes(val[1]) || this.currentInteractions.length == 0).map(val => val[1]) : this.sorted_interaction_names).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, ''))); //&& (this.data.interaction_filtering_method == "Visibility" ? true : val[0].length == 0)
-      // return this.currentInteractions == 0 || this.possible_ghost_types.length < 2 ? this.sorted_interaction_names : this.sorted_interaction_names.filter(val => this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0);
+      return (this.data.interaction_filtering_method == "Visibility" ? this.data.interaction_data.filter(val => this.all_possible_interactions.map(val => val[1]).includes(val[1]) || this.currentInteractions.length == 0).map(val => val[1]).sort() : this.sorted_interaction_names).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, '')))
+        .filter(val => 
+          this.data.ghosts_to_filter.length != 0 ? this.data.ghosts_to_filter.some(
+            val3 => this.data.interaction_data[this.data.interaction_data.map(
+              val2 => [val2[1], val2[0]])
+                .map(val2 => val2[0]).indexOf(val)][0].includes(val3)) : true);
     },
     getEndInteractionList() {
-      return this.getFilteredInteractionList().sort();
-      //return this.data.interaction_filtering_method == "Visibility" ? this.getFilteredInteractionList().sort() : this.sorted_interaction_names;
+      return this.getFilteredInteractionList();
     }
   },
   template: `
-  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:80vh; overflow:auto; max-width:100vw;">
+  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:70vh; overflow:auto; max-width:100vw;">
     <div v-if="data.possible_ghost_types.length == 1 && data.show_found_text" style="text-align:center;" :style="{color: data.current_theme_data.textColor}">
       <b>You have discovered your ghost, therefore all of the interactions have been hidden. Good job!</b>
     </div>
@@ -58,7 +61,7 @@ app.component('Alphabetical', {
     </div>
   </div>
   `
-}); //getFilteredInteractionList().length == 0
+});
 
 app.component('Categorical', {
   props: ['data', 'currentInteractions', 'reRender'],
@@ -116,7 +119,11 @@ app.component('Categorical', {
         unique_categories.push(category);
       }
       for (let category of unique_categories) {
-        final_category_inputs.push([category, this.data.interaction_data.filter(val => val[2] == category).map(val => val[1]).filter(val => this.data.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, '')))]);
+        final_category_inputs.push([category, this.data.interaction_data.filter(val => val[2] == category).map(val => val[1]).filter(val => this.data.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, ''))).filter(val => 
+          this.data.ghosts_to_filter.length != 0 ? this.data.ghosts_to_filter.some(
+            val3 => this.data.interaction_data[this.data.interaction_data.map(
+              val2 => [val2[1], val2[0]])
+                .map(val2 => val2[0]).indexOf(val)][0].includes(val3)) : true)]);
         //.filter(val => val.toLowerCase().replace(/ /g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/ /g, '')))
         //(this.data.possible_ghost_types.length > 1 && !this.data.show_found_text) && (this.data.possible_ghost_types.length == 0 || this.data.show_found_text)
       }
@@ -127,7 +134,7 @@ app.component('Categorical', {
     }
   },
   template: `
-  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:row wrap; overflow:auto; max-height:80vh; max-width:100vw; justify-content:center;">
+  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:row wrap; overflow:auto; max-height:70vh; max-width:100vw; justify-content:center;">
     <div v-if="data.possible_ghost_types.length == 1 && data.show_found_text" style="text-align:center;" :style="{color: data.current_theme_data.textColor}">
       <b>You have discovered your ghost, therefore all of the interactions have been hidden. Good job!</b>
     </div>
@@ -178,4 +185,28 @@ app.component('Basic-Setting-Dropdown', {
     </select>
   </div>
   `
-}); //changeOptionValue($event.target.value)
+});
+
+app.component('Ghost-Filter', {
+  props: ['allGhostTypes', 'filteredGhostList', 'themeData'],
+  emits: ['update:filteredGhostList'],
+  data() {
+    return {
+
+    }
+  },
+  methods: {
+    updateFilteredGhosts(ghost_name) {
+      if (this.filteredGhostList.includes(ghost_name)) this.filteredGhostList.splice(this.filteredGhostList.indexOf(ghost_name), 1);
+      else this.filteredGhostList.push(ghost_name);
+    }
+  },
+  computed: {},
+  template: `
+    <div style="display:flex; width:100%; flex-flow:row wrap;">
+      <div class="can-be-clicked" v-for="ghost_type in allGhostTypes" style="flex:1 1; min-width:100px; text-align:center; place-content:center; border:2px solid black; margin:2px;" @click="updateFilteredGhosts(ghost_type)" :style="{border: '3px solid ' + themeData.borderColor, color: themeData.textColor, backgroundColor: filteredGhostList.includes(ghost_type) ? themeData.toggledColor : themeData.backgroundColor}">
+        {{ghost_type.charAt(0).toUpperCase() + ghost_type.slice(1)}}
+      </div>
+    </div>
+  `
+});

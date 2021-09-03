@@ -25,3 +25,7 @@ body {
   background-color: gray;
   color: white;
 }
+
+.search-box::placeholder {
+  color: var(--placeholder-color);
+}
