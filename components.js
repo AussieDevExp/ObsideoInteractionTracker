@@ -33,7 +33,7 @@ app.component('Alphabetical', {
       return this.data.interaction_data.filter(val => (val[0].length == 0 && this.data.possible_ghost_types.length != 0) || this.data.possible_ghost_types.some(val2 => val[0].includes(val2[0].toLowerCase())));
     },
     getFilteredInteractionList() {
-      return (this.data.interaction_filtering_method == "Visibility" ? this.data.interaction_data.filter(val => this.all_possible_interactions.map(val => val[1]).includes(val[1]) || this.currentInteractions.length == 0).map(val => val[1]) : this.sorted_interaction_names).filter(val => val.toLowerCase().replace(/ /g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/ /g, ''))); //&& (this.data.interaction_filtering_method == "Visibility" ? true : val[0].length == 0)
+      return (this.data.interaction_filtering_method == "Visibility" ? this.data.interaction_data.filter(val => this.all_possible_interactions.map(val => val[1]).includes(val[1]) || this.currentInteractions.length == 0).map(val => val[1]) : this.sorted_interaction_names).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.data.interaction_name_search.toLowerCase().replace(/\s+/g, ''))); //&& (this.data.interaction_filtering_method == "Visibility" ? true : val[0].length == 0)
       // return this.currentInteractions == 0 || this.possible_ghost_types.length < 2 ? this.sorted_interaction_names : this.sorted_interaction_names.filter(val => this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0);
     },
     getEndInteractionList() {
