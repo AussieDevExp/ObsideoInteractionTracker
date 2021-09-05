@@ -82,7 +82,7 @@ app.component('Alphabetical', {
     }
   },
   template: `
-  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:column wrap; flex: 1 1 auto; max-height:70vh; overflow:auto; max-width:100vw;">
+  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:column wrap; flex: 1 1 auto; overflow:auto; max-width:100vw;" :style="{maxHeight: show_obsideo_banner ? '50vh' : '70vh'}">
     <div style="text-align:center; font-weight:bold; max-height:100%;" :style="{color:current_theme_data.textColor}">
       {{current_notice_message}}
     </div>
@@ -202,7 +202,7 @@ app.component('Categorical', {
     }
   },
   template: `
-  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:row wrap; overflow:auto; max-height:70vh; max-width:100vw; justify-content:center;">
+  <div v-if="data.is_correct_sort_method" style="display:flex; flex-flow:row wrap; overflow:auto; max-width:100vw; justify-content:center;" :style="{maxHeight: show_obsideo_banner ? '50vh' : '70vh'}">
     <div style="text-align:center; font-weight:bold; max-height:100%;" :style="{color:current_theme_data.textColor}">
       {{current_notice_message}}
     </div>

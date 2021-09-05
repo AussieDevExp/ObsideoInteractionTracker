@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.023",
+        current_app_version: "0.024",
         all_ghost_types,
         all_interaction_categories,
         all_interaction_ghost_types,
@@ -14,6 +14,7 @@ const app = Vue.createApp({
         interaction_marker_placements: ["Left", "Right"],
         should_show_found_text: true,
         should_show_probable_ghost_text: true,
+        should_show_obsideo_banner: true,
         setting_text_list: ["Current Theme", "Current Interaction Sorting Method", "Current Interaction Filtering Method", "Current Interaction Marker Placement"],
         setting_disabled_option_text_list: ["Select a theme!", "Select a sorting method!", "Select an interaction filtering method!", "Select an interaction marker position!"],
         tab: {
@@ -113,6 +114,10 @@ const app = Vue.createApp({
         this.should_show_probable_ghost_text = !this.should_show_probable_ghost_text;
         this.forceRerender();
       },
+      changeShowObsideoBanner() {
+        this.should_show_obsideo_banner = !this.should_show_obsideo_banner;
+        this.forceRerender();
+      },
       getMostProbableGhostType() {
         let scores = {};
         let score_nos = {
@@ -171,6 +176,7 @@ const app = Vue.createApp({
             is_correct_sort_method: this.sort_method.current == 'Alphabetical',
             current_theme_data: this.getCurrentThemeData,
             show_found_text: this.should_show_found_text,
+            show_obsideo_banner: this.should_show_obsideo_banner,
             interaction_marker_position: this.interaction_marker_position.current,
             interaction_filtering_method: this.interaction_filtering_method.current,
             interaction_name_search: this.interaction_name_search.current,
@@ -184,6 +190,7 @@ const app = Vue.createApp({
             is_correct_sort_method: this.sort_method.current == 'Categorical',
             current_theme_data: this.getCurrentThemeData,
             show_found_text: this.should_show_found_text,
+            show_obsideo_banner: this.should_show_obsideo_banner,
             interaction_marker_position: this.interaction_marker_position.current,
             interaction_filtering_method: this.interaction_filtering_method.current,
             interaction_name_search: this.interaction_name_search.current,
@@ -200,14 +207,21 @@ const app = Vue.createApp({
     },
     template: `
     <div id="app-container" :style="{backgroundColor: getCurrentThemeData.backgroundColor}">
-    <div id="flex-container" style="display:flex; flex-wrap:wrap; flex-shrink:0;">
-      <div style="overflow:auto; text-align:center; margin:10px; display:flex; justify-content:center; flex-wrap:wrap; flex-basis:100%; flex-grow:1;" :style="{color: getCurrentThemeData.textColor}">
-        <div v-html="getPossibleGhostTypeDisplay()"></div>
-        <div style="flex-basis:100%;">
-          <span style="font-weight:bold; font-style:italic;">v{{current_app_version}}</span>
+    <div id="flex-container" style="display:flex; flex-wrap:wrap; flex-shrink:0; gap:5px;">
+      <div style="overflow:auto; text-align:center; display:flex; justify-content:center; flex-wrap:wrap; flex-basis:100%; flex-grow:1;" :style="{color: getCurrentThemeData.textColor}">
+        <div style="height:auto;">
+          <div v-html="getPossibleGhostTypeDisplay()"></div>
+          <div style="flex-basis:100%;">
+            <span style="font-weight:bold; font-style:italic;">v{{current_app_version}}</span>
+          </div>
+          <div v-if="should_show_probable_ghost_text">
+            {{getMostProbableGhostTypeDisplay()}}
+          </div>
         </div>
-        <div v-if="should_show_probable_ghost_text">
-          {{getMostProbableGhostTypeDisplay()}}
+      </div>
+      <div style="display:flex; place-content:center; flex:1;">
+        <div v-if="should_show_obsideo_banner" style="flex: 1 0; max-height:150px;">
+          <img src="ObsideoBanner.png" style="display:block; margin:auto; max-height:100%; max-width:100%; object-fit:scale-down; border-radius:10px;">
         </div>
       </div>
       <div v-if="tab.current=='Tracker'" style="display:inline-flex; flex-basis:100%; flex-direction:column; gap:5px;">
@@ -227,13 +241,19 @@ const app = Vue.createApp({
         </div>
         <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="{color: this.getCurrentThemeData.textColor}">
           <div style="flex:1 0 100%;">
-            <input class="can-be-clicked" type="checkbox" id="x2" :value="should_show_found_text" @input="changeShowProbableGhostTextOption" v-model="should_show_probable_ghost_text">
+            <input class="can-be-clicked" type="checkbox" id="x2" :value="should_show_probable_ghost_text" @input="changeShowProbableGhostTextOption" v-model="should_show_probable_ghost_text">
             <label class="can-be-clicked" for="x2">{{(should_show_probable_ghost_text ? "Show" : "Hide") + " The Estimated Ghost Type/s"}}</label>
           </div>
         </div>
+        <div style="display:flex; margin:auto; flex-wrap:wrap; place-content:center; text-align:center; gap:3px; flex:0 1 100%;" :style="{color: this.getCurrentThemeData.textColor}">
+          <div style="flex:1 0 100%;">
+            <input class="can-be-clicked" type="checkbox" id="x3" :value="should_show_obsideo_banner" @input="changeShowObsideoBanner" v-model="should_show_obsideo_banner">
+            <label class="can-be-clicked" for="x3">{{(should_show_obsideo_banner ? "Show" : "Hide") + " The Obsideo Banner"}}</label>
+          </div>
+        </div>
       </div>
-      <div style="display:flex; flex-direction:row; margin:auto; flex-wrap:wrap; place-content:center; padding:10px; flex-basis:100%;" :style="{color: getCurrentThemeData.textColor}">
-        <div class="can-be-clicked highlighted-lightgray-on-hover" v-for="tab_name in tab_list" @click="tab.current=tab_name" style="margin:3px; border-radius:10px; padding:3px;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">{{tab_name}}</div>
+      <div style="display:flex; flex-direction:row; margin:auto; flex-wrap:wrap; place-content:center; flex-basis:100%; gap:3px;" :style="{color: getCurrentThemeData.textColor}">
+        <div class="can-be-clicked highlighted-lightgray-on-hover" v-for="tab_name in tab_list" @click="tab.current=tab_name" style="border-radius:10px; padding:3px;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">{{tab_name}}</div>
       </div>
     </div>
     </div>
