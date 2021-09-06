@@ -1,6 +1,6 @@
 app.component('Alphabetical', {
-  props: ['data', 'currentInteractions', 'reRender'],
-  emits: ['update:currentInteractions', 'update:reRender'],
+  props: ['data'],
+  emits: ['updateCI'],
   data() {
     return {
       ...this.data
@@ -12,11 +12,7 @@ app.component('Alphabetical', {
   },
   methods: {
     updateCurrentInteractions(value) {
-      let copy_of_current_interactions = [...this.currentInteractions];
-      if (copy_of_current_interactions.includes(value)) copy_of_current_interactions.splice(copy_of_current_interactions.indexOf(value), 1);
-      else copy_of_current_interactions.push(value);
-      this.$emit('update:currentInteractions', copy_of_current_interactions);
-      this.$emit('update:reRender', !this.reRender);
+      this.$emit('updateCI', value);
     },
     getGhostTypesForInteraction(inter_name) {
       let ghost_types_for_inter = Object.keys(this.interaction_data_ghost_types[inter_name].ghost_types);
@@ -25,7 +21,7 @@ app.component('Alphabetical', {
     getInteractionMarkerStrings() {
       let couples = {};
       Object.values(this.interaction_data_categories).flat().forEach(val => {
-        couples[val] = (this.possible_ghost_types.length != 0 && this.all_possible_interactions.some(val2 => val2 == val && this.currentInteractions.length > 0)) && this.interaction_filtering_method == "Interaction Markers" ? '>!<' : '';
+        couples[val] = (this.possible_ghost_types.length != 0 && this.all_possible_interactions.some(val2 => val2 == val && this.current_interactions.length > 0)) && this.interaction_filtering_method == "Interaction Markers" ? '>!<' : '';
       });
       this.interaction_and_marker_couples = {};
       Object.entries(couples).forEach(val => {
@@ -41,7 +37,7 @@ app.component('Alphabetical', {
       this.interaction_text_styling = {};
       Object.values(this.interaction_data_categories).flat().forEach(inter_name => (
         this.interaction_text_styling[inter_name] = {
-          fontWeight: this.currentInteractions.includes(inter_name) ? 'bold' : 'normal'
+          fontWeight: this.current_interactions.includes(inter_name) ? 'bold' : 'normal'
         }
       ));
     }
@@ -70,7 +66,7 @@ app.component('Alphabetical', {
         .filter((_, notice_message_no) => notice_message_no == 0)[0];
     },
     filtered_interaction_list() {
-      return (Object.values(this.interaction_data_categories).flat().filter(val => this.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true)).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.interaction_name_search.toLowerCase().replace(/\s+/g, ''))).filter(val => this.ghosts_to_filter.length != 0 ? this.ghosts_to_filter.some(val3 => (!this.possible_ghost_types.includes(val3) ? this.getGhostTypesForInteraction(val).includes(val3) : true)) : true).sort();
+      return (Object.values(this.interaction_data_categories).flat().filter(val => this.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.current_interactions.length == 0 : true)).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.interaction_name_search.toLowerCase().replace(/\s+/g, ''))).filter(val => this.ghosts_to_filter.length != 0 ? this.ghosts_to_filter.some(val3 => (!this.possible_ghost_types.includes(val3) ? this.getGhostTypesForInteraction(val).includes(val3) : true)) : true).sort();
     },
     all_possible_interactions() {
       return Object.entries(this.interaction_data_ghost_types).map(val => [val[0], Object.keys(val[1].ghost_types)])
@@ -88,7 +84,7 @@ app.component('Alphabetical', {
     </div>
     <div v-if="!current_notice_message" style="display:flex; flex-flow:column wrap; max-height:100%;">
       <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in filtered_interaction_list" style="margin:2px; padding:2px;" :style="interaction_container_styling">
-        <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx" :value="interaction" :checked="currentInteractions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
+        <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx" :value="interaction" :checked="current_interactions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
         <label class="can-be-clicked" :for="'interaction'+idx" :style="interaction_text_styling[interaction]" v-html="interaction_and_marker_couples[interaction]"></label>
       </div>
     </div>
@@ -97,8 +93,8 @@ app.component('Alphabetical', {
 });
 
 app.component('Categorical', {
-  props: ['data', 'currentInteractions', 'reRender'],
-  emits: ['update:currentInteractions', 'update:reRender'],
+  props: ['data'],
+  emits: ['updateCI'],
   data() {
     return {
       ...this.data
@@ -110,19 +106,12 @@ app.component('Categorical', {
   },
   methods: {
     updateCurrentInteractions(value) {
-      let copy_of_current_interactions = [...this.currentInteractions];
-      if (copy_of_current_interactions.includes(value)) copy_of_current_interactions.splice(copy_of_current_interactions.indexOf(value), 1);
-      else copy_of_current_interactions.push(value);
-      this.$emit('update:currentInteractions', copy_of_current_interactions);
-      this.$emit('update:reRender', !this.reRender);
+      this.$emit('updateCI', value);
     },
     clearCategoryInteractions(category_no) {
       let checkboxes = document.getElementsByClassName("interaction-checkbox");
       let checked_checkboxes = Array.prototype.filter.call(checkboxes, val => val.checked && this.getGroupedInteractions()[category_no][1].includes(val.value));
-      let copy_of_current_interactions = [...this.currentInteractions];
-      for (let checkbox of checked_checkboxes) copy_of_current_interactions.splice(copy_of_current_interactions.indexOf(checkbox.value), 1);
-      this.$emit('update:currentInteractions', copy_of_current_interactions);
-      this.$emit('update:reRender', !this.reRender);
+      for (let checkbox of checked_checkboxes) this.$emit('updateCI', checkbox.value);
     },
     getGhostTypesForInteraction(inter_name) {
       let ghost_types_for_inter = Object.keys(this.interaction_data_ghost_types[inter_name].ghost_types);
@@ -130,7 +119,7 @@ app.component('Categorical', {
     },
     getAllPossibleInteractions() {
       console.log(Object.entries(this.interaction_data_ghost_types).map(val => [val[0], Object.keys(val[1].ghost_types)]).filter(val => val[1].length == 0 || this.possible_ghost_types.some(val2 => val[1].includes(val2[0]))).map(val => val[0]))
-      return this.currentInteractions.length > 0 && this.possible_ghost_types.length >= 1 ? Object.entries(this.interaction_data_ghost_types).map(val => [val[0], Object.keys(val[1].ghost_types)]).filter(val => val[1].length == 0 || this.possible_ghost_types.some(val2 => val[1].includes(val2[0]))).map(val => val[0]) : new Array();
+      return this.current_interactions.length > 0 && this.possible_ghost_types.length >= 1 ? Object.entries(this.interaction_data_ghost_types).map(val => [val[0], Object.keys(val[1].ghost_types)]).filter(val => val[1].length == 0 || this.possible_ghost_types.some(val2 => val[1].includes(val2[0]))).map(val => val[0]) : new Array();
     },
     getGroupedInteractions() {
       let final_category_inputs = new Array();
@@ -148,7 +137,7 @@ app.component('Categorical', {
       this.interaction_text_styling = {};
       Object.values(this.interaction_data_categories).flat().forEach(inter_name => (
         this.interaction_text_styling[inter_name] = {
-          fontWeight: this.currentInteractions.includes(inter_name) ? 'bold' : 'normal'
+          fontWeight: this.current_interactions.includes(inter_name) ? 'bold' : 'normal'
         }
       ));
       this.clear_button_styling = {
@@ -163,7 +152,7 @@ app.component('Categorical', {
     getInteractionMarkerStrings() {
       let couples = {};
       Object.values(this.interaction_data_categories).flat().forEach(val => {
-        couples[val] = (this.possible_ghost_types.length != 0 && this.all_possible_interactions.some(val2 => val2 == val && this.currentInteractions.length > 0)) && this.interaction_filtering_method == "Interaction Markers" ? '>!<' : '';
+        couples[val] = (this.possible_ghost_types.length != 0 && this.all_possible_interactions.some(val2 => val2 == val && this.current_interactions.length > 0)) && this.interaction_filtering_method == "Interaction Markers" ? '>!<' : '';
       });
       this.interaction_and_marker_couples = {};
       Object.entries(couples).forEach(val => {
@@ -198,7 +187,7 @@ app.component('Categorical', {
       return this.possible_ghost_types.length >= 1 ? Object.entries(this.interaction_data_ghost_types).map(val => [val[0], Object.keys(val[1].ghost_types)]).filter(val => val[1].length == 0 || this.possible_ghost_types.some(val2 => val[1].includes(val2[0]))).map(val => val[0]) : new Array();
     },
     filtered_interaction_list() {
-      return (Object.values(this.interaction_data_categories).flat().filter(val => this.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.currentInteractions.length == 0 : true)).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.interaction_name_search.toLowerCase().replace(/\s+/g, ''))).filter(val => this.ghosts_to_filter.length != 0 ? this.ghosts_to_filter.some(val3 => (!this.possible_ghost_types.includes(val3) ? this.getGhostTypesForInteraction(val).includes(val3) : true)) : true).sort();
+      return (Object.values(this.interaction_data_categories).flat().filter(val => this.interaction_filtering_method == "Visibility" ? this.all_possible_interactions.includes(val) || this.current_interactions.length == 0 : true)).filter(val => val.toLowerCase().replace(/\s+/g, '').includes(this.interaction_name_search.toLowerCase().replace(/\s+/g, ''))).filter(val => this.ghosts_to_filter.length != 0 ? this.ghosts_to_filter.some(val3 => (!this.possible_ghost_types.includes(val3) ? this.getGhostTypesForInteraction(val).includes(val3) : true)) : true).sort();
     }
   },
   template: `
@@ -212,7 +201,7 @@ app.component('Categorical', {
         <div class="can-be-clicked" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="clear_button_styling" @click="clearCategoryInteractions(idx2)">Clear Category</div>
         <div style="display:inline-flex; flex-flow:column; flex: 1 1 auto; overflow:auto; max-height:100%;">
           <div class="highlighted-gray-on-hover" v-for="(interaction, idx) in interactions[1].sort()" style="margin:2px; padding:2px;" :style="interaction_container_styling">
-            <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx+idx2" :value="interaction" :checked="currentInteractions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
+            <input class="interaction-checkbox can-be-clicked" type="checkbox" :id="'interaction'+idx+idx2" :value="interaction" :checked="current_interactions.includes(interaction)" @input="updateCurrentInteractions($event.target.value)">
             <label class="can-be-clicked" :for="'interaction'+idx+idx2" :style="interaction_text_styling[interaction]" v-html="interaction_and_marker_couples[interaction]"></label>
           </div>
         </div>

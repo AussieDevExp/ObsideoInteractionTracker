@@ -1,7 +1,7 @@
 const app = Vue.createApp({
     data: function() {
       return {
-        current_app_version: "0.024",
+        current_app_version: "0.025",
         all_ghost_types,
         all_interaction_categories,
         all_interaction_ghost_types,
@@ -145,7 +145,7 @@ const app = Vue.createApp({
           if (val[1] > top_score) top_score = val[1];
           else if (val[1] == top_score) top_ghosts.push(val[0]);
         });
-        return top_ghosts;
+        return top_ghosts.filter(val => this.getAllPossibleGhostTypes().length != 0 ? this.getAllPossibleGhostTypes().map(val2 => val2[0]).includes(val) : true);
       },
       getMostProbableGhostTypeDisplay() {
         let string = "";
@@ -163,6 +163,10 @@ const app = Vue.createApp({
         }
         string += ".";
         return string;
+      },
+      updateCurrentInteractions(value) {
+        if (this.current_selected_interactions.includes(value)) this.current_selected_interactions.splice(this.current_selected_interactions.indexOf(value), 1);
+        else this.current_selected_interactions.push(value);
       }
     },
     computed: {
@@ -183,7 +187,8 @@ const app = Vue.createApp({
             ghosts_to_filter: this.ghosts_to_filter.current,
             all_ghost_types: Object.keys(this.all_ghost_types),
             interaction_data_categories:this.all_interaction_categories,
-            interaction_data_ghost_types:this.all_interaction_ghost_types
+            interaction_data_ghost_types:this.all_interaction_ghost_types,
+            current_interactions: this.current_selected_interactions
           },
           "categorical": {
             possible_ghost_types: this.getAllPossibleGhostTypes(),
@@ -197,7 +202,8 @@ const app = Vue.createApp({
             ghosts_to_filter: this.ghosts_to_filter.current,
             all_ghost_types: Object.keys(this.all_ghost_types),
             interaction_data_categories:this.all_interaction_categories,
-            interaction_data_ghost_types:this.all_interaction_ghost_types
+            interaction_data_ghost_types:this.all_interaction_ghost_types,
+            current_interactions: this.current_selected_interactions
           }
         };
       },
@@ -228,8 +234,8 @@ const app = Vue.createApp({
           <div class="can-be-clicked highlighted-lightgray-on-hover" @click="clearAllInteractions" style="display:inline-block; border:3px solid black; padding:2px; border-radius:10px; text-align:center; margin:auto;" :style="{border: '3px solid ' + getCurrentThemeData.borderColor, color: getCurrentThemeData.textColor, backgroundColor: getCurrentThemeData.backgroundColor}">Clear All Interactions</div>
           <Ghost-Filter :allGhostTypes="Object.keys(all_ghost_types)" :themeData="getCurrentThemeData" v-model:filteredGhostList="ghosts_to_filter.current"></Ghost-Filter>
           <input class="search-box" style="text-align:center; max-width: 150px; border-radius:5px; margin:auto;" :style="{color: getCurrentThemeData.textColor, '--placeholder-color': getCurrentThemeData.textColor, border: '3px solid ' + getCurrentThemeData.borderColor, backgroundColor: getCurrentThemeData.backgroundColor}" v-model="interaction_name_search.current" placeholder="Interaction Name">
-          <Alphabetical v-model:data="getSortingMethodData['alphabetical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="[force_rerender, interaction_name_search.current]"></Alphabetical>
-          <Categorical v-model:data="getSortingMethodData['categorical']" v-model:currentInteractions="current_selected_interactions" v-model:reRender="force_rerender" :key="[force_rerender, interaction_name_search.current]"></Categorical>
+          <Alphabetical :data="getSortingMethodData['alphabetical']" :key="[force_rerender, interaction_name_search.current]" @updateCI="updateCurrentInteractions"></Alphabetical>
+          <Categorical :data="getSortingMethodData['categorical']" :key="[force_rerender, interaction_name_search.current]" @updateCI="updateCurrentInteractions"></Categorical>
       </div>
       <div v-if="tab.current=='Settings'" style="display:flex; flex-wrap:wrap; flex-basis:100%; flex-direction:row; margin:auto; align-items:center; gap:10px;">
         <Basic-Setting-Dropdown v-for="(_, idx) in new Array(getAllOptionLists().length)" :optionList="getAllOptionLists()[idx]" :bool="getOptionBools()[idx]" :disabledOptionValue="setting_disabled_option_text_list[idx]" :settingMainText="setting_text_list[idx]" :currentThemeData="getCurrentThemeData" v-model:optionValue="getAllOptionValues[idx][0][getAllOptionValues[idx][1]]" v-model:reRender="force_rerender" :key="force_rerender+'setting'+idx"></Basic-Setting-Dropdown>
